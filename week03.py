@@ -15,9 +15,7 @@ def order_process(idx: int):
     amounts[idx] = amounts[idx] + 1
 
 
-menu_lists = ""
-for k in range(len(drinks)):
-    menu_lists = menu_lists + f"{k+1}) {drinks[k]} {prices[k]}won  "
+menu_lists = "".join([f"{k+1}) {drinks[k]} {prices[k]}won  " for k in range(len(drinks))])
 menu_lists = menu_lists + f"{len(drinks)+1}) Exit : "
 
 while True:
