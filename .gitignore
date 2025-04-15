@@ -6,8 +6,7 @@
 temp.py
 mymodule.py
 *.exe
-temp.db
-test.db
+*.db
 test.db-journal
 # User-specific stuff
 .idea/**/workspace.xml
