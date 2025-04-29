@@ -9,19 +9,19 @@ class Menu:
         self.drinks = drinks
         self.prices = prices
 
-    def get_price(self, idx):
+    def get_price(self, idx: int) -> int:
         if 0 <= idx < len(self.prices):
             return self.prices[idx]
         else:
             raise IndexError("Invalid menu index.")
 
-    def get_drink_name(self, idx):
+    def get_drink_name(self, idx: int) -> str:
         if 0 <= idx < len(self.drinks):
             return self.drinks[idx]
         else:
             raise IndexError("Invalid menu index.")
 
-    def get_menu_length(self):
+    def get_menu_length(self) -> int:
         return len(self.drinks)
 
 class OrderProcessor:
@@ -43,18 +43,18 @@ class OrderProcessor:
         ''')
         self.conn.commit()
 
-    def apply_discount(self, price):
+    def apply_discount(self, price: int) -> float:
         if price >= self.DISCOUNT_THRESHOLD:
             return price * (1 - self.DISCOUNT_RATE)
         return price
 
-    def process_order(self, idx):
-        drink_name = self.menu.get_drink_name(idx)
+    def process_order(self, idx: int) -> None:
+        # drink_name = self.menu.get_drink_name(idx)
         drink_price = self.menu.get_price(idx)
         self.total_price += drink_price
         self.amounts[idx] += 1
 
-    def get_receipt(self):
+    def get_receipt(self) -> str:
         lines = []
         lines.append(f"{'Product':<15} {'Price':<10} {'Amount':<10} {'Subtotal':<10}")
         lines.append("-" * 50)
@@ -75,7 +75,7 @@ class OrderProcessor:
             lines.append(f"{'Total price:':<30} {self.total_price} won")
         return "\n".join(lines)
 
-    def get_next_ticket_number(self):
+    def get_next_ticket_number(self) -> int:
         self.cur.execute('select number from ticket order by number desc limit 1')
         result = self.cur.fetchone()
         if result is None:
@@ -87,7 +87,7 @@ class OrderProcessor:
         self.conn.commit()
         return number
 
-    def reset(self):
+    def reset(self) -> None:
         self.amounts = [0] * self.menu.get_menu_length()
         self.total_price = 0
 
@@ -103,7 +103,7 @@ class KioskApp:
         self.root.title("Cafe Kiosk")
         self.create_widgets()
 
-    def create_widgets(self):
+    def create_widgets(self) -> None:
         # 메뉴 버튼
         self.buttons = []
         for idx, (drink, price) in enumerate(zip(self.menu.drinks, self.menu.prices)):
@@ -128,11 +128,11 @@ class KioskApp:
 
         self.update_order_text()
 
-    def add_order(self, idx):
+    def add_order(self, idx: int) -> None:
         self.order_processor.process_order(idx)
         self.update_order_text()
 
-    def update_order_text(self):
+    def update_order_text(self) -> None:
         self.order_text.config(state='normal')
         self.order_text.delete(1.0, tk.END)
         for i in range(self.menu.get_menu_length()):
@@ -149,7 +149,7 @@ class KioskApp:
             self.order_text.insert(tk.END, f"\nDiscount: {discount}원\nDiscounted Total: {discounted}원")
         self.order_text.config(state='disabled')
 
-    def finish_order(self):
+    def finish_order(self) -> None:
         if self.order_processor.total_price == 0:
             messagebox.showinfo("Notice", "Please order at least one drink.")
             return
@@ -159,6 +159,6 @@ class KioskApp:
         self.order_processor.reset()
         self.update_order_text()
 
-    def cancel_order(self):
+    def cancel_order(self) -> None:
         self.order_processor.reset()
         self.update_order_text()
