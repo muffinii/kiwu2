@@ -4,7 +4,6 @@ import sqlite3
 
 class Menu:
     """Represents the cafe menu."""
-
     def __init__(self, drinks: List[str], prices: List[int]):
         """
         Initialization method for the Menu class.
@@ -17,6 +16,7 @@ class Menu:
         self.drinks = drinks
         self.prices = prices
 
+
     def display_menu(self) -> str:
         """
         Generate a dynamic menu string
@@ -26,6 +26,7 @@ class Menu:
             [f"{k + 1}) {self.drinks[k]} {self.prices[k]} won\n"
              for k in range(len(self.drinks))]
         ) + f"{len(self.drinks) + 1}) Exit : "
+
 
     def get_price(self, idx: int) -> int:
         """
@@ -38,6 +39,7 @@ class Menu:
         else:
             raise IndexError("Invalid menu index.")
 
+
     def get_drink_name(self, idx: int) -> str:
         """
         Get the name of a drink at a given index.
@@ -49,6 +51,7 @@ class Menu:
         else:
             raise IndexError("Invalid menu index.")
 
+
     def get_menu_length(self) -> int:
         """
         Get the number of items on the menu.
@@ -59,7 +62,6 @@ class Menu:
 
 class OrderProcessor:
     """Processes cafe orders, applies discounts, and prints receipts."""
-
     DISCOUNT_THRESHOLD = 10000
     DISCOUNT_RATE = 0.1
 
@@ -85,7 +87,6 @@ class OrderProcessor:
         self.conn.commit()
 
 
-
     def apply_discount(self, price: int) -> float:
         """
         Apply discount rate when the total amount exceeds a certain threshold
@@ -95,6 +96,7 @@ class OrderProcessor:
         if price >= self.DISCOUNT_THRESHOLD:
             return price * (1 - self.DISCOUNT_RATE)
         return price
+
 
     def process_order(self, idx: int) -> None:
         """
@@ -107,6 +109,7 @@ class OrderProcessor:
         print(f"{drink_name} ordered. Price: {drink_price} won")
         self.total_price += drink_price
         self.amounts[idx] += 1
+
 
     def print_receipt(self) -> None:
         """Print order summary and final price with formatted alignment using f-string"""
@@ -132,6 +135,7 @@ class OrderProcessor:
             print(f"{'No discount applied.':<30}")
             print(f"{'Total price:':<30} {self.total_price:>5} won")
 
+
     def get_next_ticket_number(self) -> int:
         """
         Function that Produce next ticket number (Database version)
@@ -151,6 +155,7 @@ class OrderProcessor:
 
         self.conn.commit()
         return number
+
 
     def run(self):
         """Execute the order system"""
@@ -172,6 +177,7 @@ class OrderProcessor:
 
         self.print_receipt()
         print(f"Queue number ticket : {self.get_next_ticket_number()}")
+
 
     def __del__(self):
         print('End program')
