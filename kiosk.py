@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import sqlite3
 from typing import List
+from datetime import datetime
 
 
 class Menu:
@@ -105,7 +106,7 @@ class OrderProcessor:
         drink_name = self.menu.get_drink_name(idx)
         drink_price = self.menu.get_price(idx)
 
-        print(f"{drink_name} ordered. Price: {drink_price} won")
+        # print(f"{drink_name} ordered. Price: {drink_price} won")
         self.total_price += drink_price
         self.amounts[idx] += 1
 
@@ -135,7 +136,7 @@ class OrderProcessor:
         else:
             receipt_text += f"{'No discount applied.':<30}\n"
             receipt_text += f"{'Total price:':<30} {self.total_price:>5} won\n"
-
+        receipt_text = receipt_text + '\t' + datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return receipt_text
 
     def get_next_ticket_number(self) -> int:
@@ -163,7 +164,7 @@ class OrderProcessor:
         Destructor method for OrderProcessor - close database connection
         :return: None
         """
-        print('End program')
+        # print('End program')
         self.conn.close()  # db connection close ....
 
 
