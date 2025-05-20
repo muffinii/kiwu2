@@ -303,6 +303,7 @@ class KioskGUI:
                 self.weather_label.config(text=f"Weather information cannot be loaded. (Status code : {response.status_code})")
         except Exception as err:
             self.weather_label.config(text=f"Weather information error\n{err}")
+            # messagebox.showerror("Error", f"Weather information error\n{err}")
             # print(err)
 
 
@@ -313,7 +314,7 @@ class KioskGUI:
         """
         self.order_processor.process_order(idx)
         self.update_order_display()
-        self.update_weather_info()  # 추가 주문 시 날씨 정보 로딩
+        self.update_weather_info()  # Load weather data
 
     def update_order_display(self) -> None:
         """Update the order summary in the text widget"""
