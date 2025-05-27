@@ -169,6 +169,10 @@ class OrderProcessor:
         self.conn.close()  # db connection close ....
 
 
+class WeatherManager:
+    pass
+
+
 class KioskGUI:
     def __init__(self, root: tk.Tk, menu_drinks: List[str], menu_prices: List[int]) -> None:
         self.root = root
@@ -182,6 +186,9 @@ class KioskGUI:
 
         # Create UI components
         self.create_widgets()
+
+        # Initialize weather manager
+
 
     def create_widgets(self) -> None:
         """Create and initialize all GUI widgets"""
@@ -287,24 +294,24 @@ class KioskGUI:
         self.root.grid_columnconfigure(1, weight=1)
 
 
-    def update_weather_info(self) -> None:
-        """ Load weather data from 'wttr.in'"""
-        # url = "https://wttr.in/incheon?&0&Q"
-        # url = "https://wttr.in/incheon?format=4"  # ok
-        # url = "https://naver.com/kim"  # 404
-        url = "https://wttr123.in/incheon?format=4"  # exception occur
-        # url = "https://www.nate.com"
-        try:
-            response = requests.get(url)  # exception occur
-            weather_text = response.text.strip()
-            if response.status_code == 200:
-                self.weather_label.config(text=f"Current weather ({weather_text})")
-            else:
-                self.weather_label.config(text=f"Weather information cannot be loaded. (Status code : {response.status_code})")
-        except Exception as err:
-            self.weather_label.config(text=f"Weather information error\n{err}")
-            # messagebox.showerror("Error", f"Weather information error\n{err}")
-            # print(err)
+    # def update_weather_info(self) -> None:
+    #     """ Load weather data from 'wttr.in'"""
+    #     # url = "https://wttr.in/incheon?&0&Q"
+    #     url = "https://wttr.in/incheon?format=2"  # ok
+    #     # url = "https://naver.com/kim"  # 404
+    #     # url = "https://wttr123.in/incheon?format=4"  # exception occur
+    #     # url = "https://www.nate.com"
+    #     try:
+    #         response = requests.get(url)
+    #         weather_text = response.text.strip()
+    #         if response.status_code == 200:
+    #             self.weather_label.config(text=f"Current weather ({weather_text})")
+    #         else:
+    #             self.weather_label.config(text=f"Weather information cannot be loaded. (Status code : {response.status_code})")
+    #     except Exception as err:
+    #         self.weather_label.config(text=f"Weather information error\n{err}")
+    #         # messagebox.showerror("Error", f"Weather information error\n{err}")
+    #         # print(err)
 
 
     def add_to_order(self, idx: int) -> None:
@@ -314,7 +321,8 @@ class KioskGUI:
         """
         self.order_processor.process_order(idx)
         self.update_order_display()
-        self.update_weather_info()  # Load weather data
+        # self.update_weather_info()  # Load weather data
+
 
     def update_order_display(self) -> None:
         """Update the order summary in the text widget"""
@@ -354,6 +362,7 @@ class KioskGUI:
         # Disable editing
         self.order_text.config(state=tk.DISABLED)
 
+
     def complete_order(self) -> None:
         """Complete the current order and show receipt"""
         if self.order_processor.total_price <= 0:
@@ -390,6 +399,7 @@ class KioskGUI:
             command=lambda: [receipt_window.destroy(), self.reset_order()]
         ).pack(pady=10)
 
+
     def reset_order(self) -> None:
         """Reset the current order"""
         # Create a new OrderProcessor with the same menu
@@ -397,8 +407,8 @@ class KioskGUI:
         # Update display
         self.update_order_display()
 
+
     def exit_program(self) -> None:
         """Exit the program"""
         if messagebox.askyesno("Exit", "Are you sure you want to exit?"):
             self.root.destroy()
-
