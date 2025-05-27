@@ -1,3 +1,5 @@
+import threading
+import time
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
@@ -170,7 +172,53 @@ class OrderProcessor:
 
 
 class WeatherManager:
-    pass
+    def __init__(self):
+        self.current_weather = "Loading weather information..."
+        self.last_update_time = 0
+        self.update_interval = 30  # 30초 마다 업데이트
+        self.is_updating = False
+
+
+    def should_update(self) -> bool:
+        """Check weather information"""
+        current_time = time.time()
+        return (current_time - self.last_update_time) > self.update_interval
+
+
+    def update_weather_async(self, callback_func) -> None:
+        """Update weather information asynchronously"""
+        if self.is_updating:
+            return  # 이미 업데이트 중이면 중복 요청 방지
+
+        def fetch_weather():
+            self.is_updating = True
+            try:
+                url = "https://wttr.in/incheon?format=4"
+                response = requests.get(url, timeout=5)  # 타임아웃 설정
+
+                if response.status_code == 200:
+                    weather_text = response.text.strip()
+                    self.current_weather = f"Current weather ({weather_text})"
+                else:
+                    self.current_weather = f"Weather information cannot be loaded. (Status code : {response.status_code})"
+
+                self.last_update_time = time.time()
+
+            except requests.exceptions.Timeout:
+                self.current_weather = "Weather information timeout"
+            except requests.exceptions.RequestException as err:
+                self.current_weather = f"Weather information error: Connection failed"
+            except Exception as err:
+                self.current_weather = f"Weather information error: {str(err)}"
+            finally:
+                self.is_updating = False
+                # UI 업데이트를 위한 콜백 호출
+                if callback_func:
+                    callback_func(self.current_weather)
+
+        # 백그라운드 스레드에서 실행
+        thread = threading.Thread(target=fetch_weather, daemon=True)
+        thread.start()
 
 
 class KioskGUI:
@@ -183,11 +231,19 @@ class KioskGUI:
         # Initialize menu and order processor
         self.menu = Menu(menu_drinks, menu_prices)
         self.order_processor = OrderProcessor(self.menu)
+        # Initialize weather manager
+        self.weather_manager = WeatherManager()
 
         # Create UI components
         self.create_widgets()
 
-        # Initialize weather manager
+        # Async update
+        self.weather_manager.update_weather_async(self.update_weather_display)
+
+
+    def update_weather_display(self, weather_text: str) -> None:
+        """UI의 날씨 정보를 업데이트 (메인 스레드에서 실행)"""
+        self.root.after(0, lambda: self.weather_label.config(text=weather_text))
 
 
     def create_widgets(self) -> None:
@@ -322,6 +378,8 @@ class KioskGUI:
         self.order_processor.process_order(idx)
         self.update_order_display()
         # self.update_weather_info()  # Load weather data
+        if self.weather_manager.should_update():
+            self.weather_manager.update_weather_async(self.update_weather_display)
 
 
     def update_order_display(self) -> None:
